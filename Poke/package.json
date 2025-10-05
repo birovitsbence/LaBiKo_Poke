@@ -1,0 +1,25 @@
+{
+  "name": "poke",
+  "version": "1.0.0",
+  "description": "A Vue.js application to display Pokémon details.",
+  "main": "src/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.2.0",
+    "vue-router": "^4.0.0"
+  },
+  "devDependencies": {
+    "vite": "^2.0.0"
+  },
+  "keywords": [
+    "vue",
+    "pokemon",
+    "frontend"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

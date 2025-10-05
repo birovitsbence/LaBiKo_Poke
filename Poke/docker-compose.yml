@@ -1,0 +1,11 @@
+version: '3'
+services:
+  frontend:
+    image: idomi27/vue:26
+    container_name: poke-frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "80:80"
+    command: pnpm run dev --host

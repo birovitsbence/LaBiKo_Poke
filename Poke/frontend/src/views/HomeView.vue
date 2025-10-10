@@ -1,26 +1,54 @@
 <template>
   <div>
     <h1 class="text-4xl font-bold mb-6 text-center">Pokédex</h1>
-    <div class="mb-6 flex flex-col md:flex-row gap-4">
-      <input v-model="search" placeholder="Keresés név, típus vagy Pokédex szám alapján" class="border p-2 rounded w-full md:w-1/2" />
-      <select v-model="typeFilter" class="border p-2 rounded w-full md:w-1/4">
+
+    <div class="mb-8 flex flex-col items-center gap-4">
+      <input
+        v-model="search"
+        placeholder="Keresés név, típus vagy Pokédex szám alapján"
+        class="border p-2 rounded w-full max-w-md text-center"
+      />
+
+      <select v-model="typeFilter" class="border p-2 rounded w-full max-w-xs text-center">
         <option value="">Összes típus</option>
+        <option :value="FAVORITES">Kedvencek</option>
         <option v-for="type in types" :key="type" :value="type">{{ type }}</option>
       </select>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <div v-if="filteredPokemons.length === 0" class="text-center text-lg text-gray-500 mt-10">
+      ❌ Nem található ilyen Pokémon az adatbázisban.
+    </div>
+
+    <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <PokemonCard
         v-for="pokemon in filteredPokemons"
         :key="pokemon.id"
         :pokemon="pokemon"
+        :is-favorite="favoritesSet.has(pokemon.id)"
+        @toggle-favorite="toggleFavorite"
       />
     </div>
   </div>
 </template>
 
+
 <script setup>
 import { ref, computed } from 'vue'
 import PokemonCard from '../components/PokemonCard.vue'
+
+const FAVORITES = '__FAVORITES__'
+
+const loadFav = () => {
+  try { return JSON.parse(localStorage.getItem('favorites') || '[]') } catch { return [] }
+}
+const favoritesSet = ref(new Set(loadFav()))
+const saveFav = () => localStorage.setItem('favorites', JSON.stringify([...favoritesSet.value]))
+const toggleFavorite = (id) => {
+  if (favoritesSet.value.has(id)) favoritesSet.value.delete(id)
+  else favoritesSet.value.add(id)
+  saveFav()
+}
 
 const pokemons = ref([
   {
@@ -553,12 +581,19 @@ const types = computed(() => {
   return [...new Set(allTypes)]
 })
 
-const filteredPokemons = computed(() =>
-  pokemons.value.filter(p =>
-    (p.name.toLowerCase().includes(search.value.toLowerCase()) ||
-     p.type.toLowerCase().includes(search.value.toLowerCase()) ||
-     String(p.id).includes(search.value)) &&
-    (typeFilter.value === '' || p.type.includes(typeFilter.value))
-  )
-)
+const matchesSearch = (p) =>
+  p.name.toLowerCase().includes(search.value.toLowerCase()) ||
+  p.type.toLowerCase().includes(search.value.toLowerCase()) ||
+  String(p.id).includes(search.value)
+
+
+const filteredPokemons = computed(() => {
+  let list = pokemons.value.filter(matchesSearch)
+  if (typeFilter.value === FAVORITES) {
+    list = list.filter(p => favoritesSet.value.has(p.id))
+  } else if (typeFilter.value) {
+    list = list.filter(p => p.type.includes(typeFilter.value))
+  }
+  return list
+})
 </script>

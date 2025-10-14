@@ -1,13 +1,17 @@
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
+// fontos: vitest/config
+import { defineConfig } from 'vitest/config'
+import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue()],
   server: {
-    host: 'vm1.test',
-    port: 3000,
+    host: true,
+    port: 80,
+    allowedHosts: ['vm1.test']
   },
-  build: {
-    outDir: 'dist',
-  },
-});
+  test: {
+    environment: 'jsdom',
+    globals: true,                    // describe/it/expect globálisan
+    coverage: { provider: 'v8', reporter: ['text', 'html'] }
+  }
+})

@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "vue": "^3.2.0",
@@ -20,6 +23,6 @@
     "pokemon",
     "frontend"
   ],
-  "author": "Your Name",
+  "author": "LaBiKo",
   "license": "MIT"
 }

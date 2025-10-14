@@ -34,7 +34,45 @@ describe('HomeView.vue', () => {
     await input.setValue('25')        // ID
     expect(w.text()).toContain('Pikachu')
   })
-    it('típus opciók tartalmaznak néhány fő típust', () => {
+
+  it('nincs találat üzenet', async () => {
+    const w = mount(HomeView)
+    await w.get('input[placeholder^="Keresés"]').setValue('nemletezik123')
+    expect(w.text()).toContain('❌ Nem található ilyen Pokémon')
+    expect(w.findAllComponents(PokemonCard).length).toBe(0)
+  })
+
+  it('Kedvencek szűrő csak kedvenceket adja', async () => {
+    setFav([25]) // Pikachu
+    const w = mount(HomeView)
+    const select = w.get('select')
+
+    await select.setValue(FAVORITES)
+    const cards = w.findAllComponents(PokemonCard)
+    expect(cards.length).toBe(1)
+    expect(cards[0].props('pokemon').id).toBe(25)
+    expect(cards[0].props('isFavorite')).toBe(true)
+  })
+
+  it('kedvencre váltás elmentődik localStorage-ba', async () => {
+    setFav([])
+    const w = mount(HomeView)
+    const select = w.get('select')
+
+    // jelöld kedvenccé Pikachut
+    const pika = w.findAllComponents(PokemonCard).find(c => c.props('pokemon').name === 'Pikachu')
+    await pika.vm.$emit('toggle-favorite', pika.props('pokemon').id)
+
+    const saved = JSON.parse(window.localStorage.getItem('favorites') || '[]')
+    expect(saved).toContain(25)
+
+    await select.setValue(FAVORITES)
+    const favs = w.findAllComponents(PokemonCard)
+    expect(favs.length).toBe(1)
+    expect(favs[0].props('pokemon').id).toBe(25)
+  })
+
+  it('típus opciók tartalmaznak néhány fő típust', () => {
     const w = mount(HomeView)
     const options = w.findAll('select option').map(o => o.text())
     expect(options).toEqual(expect.arrayContaining(['Összes típus', 'Kedvencek', 'Fire', 'Water', 'Grass', 'Poison', 'Electric']))

@@ -45,4 +45,18 @@ describe('PokemonCard.vue', () => {
     expect(w.text()).toContain('Lv. Friendship')
     expect(w.text()).toContain('Lv. Thunder Stone')
   })
+
+  it('kedvenc gomb: csillag/aria-label és emit id-vel', async () => {
+    const w = mount(PokemonCard, { props: { pokemon: POKEMON, isFavorite: true } })
+    const btn = w.get('button[title="Kedvenc"]')
+    expect(btn.text()).toContain('★')
+    expect(btn.attributes('aria-label')).toContain('Kedvencből kivesz')
+
+    await w.setProps({ isFavorite: false })
+    expect(btn.text()).toContain('☆')
+    expect(btn.attributes('aria-label')).toContain('Kedvencbe tesz')
+
+    await btn.trigger('click')
+    expect(w.emitted()['toggle-favorite'][0]).toEqual([POKEMON.id])
+  })
 })

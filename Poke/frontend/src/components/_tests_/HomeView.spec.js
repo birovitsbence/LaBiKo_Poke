@@ -34,4 +34,9 @@ describe('HomeView.vue', () => {
     await input.setValue('25')        // ID
     expect(w.text()).toContain('Pikachu')
   })
+    it('típus opciók tartalmaznak néhány fő típust', () => {
+    const w = mount(HomeView)
+    const options = w.findAll('select option').map(o => o.text())
+    expect(options).toEqual(expect.arrayContaining(['Összes típus', 'Kedvencek', 'Fire', 'Water', 'Grass', 'Poison', 'Electric']))
+  })
 })
